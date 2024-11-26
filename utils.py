@@ -1,10 +1,11 @@
 import os
 import json
 
-import numpy
+import random
 import torch
 import datasets
 
+import numpy as np
 
 from typing import Optional, Dict, List, Union, Tuple
 
@@ -50,7 +51,6 @@ def _get_batch_logps(
 def get_batch_metrics(
     model,
     batch: Dict[str, Union[List, torch.LongTensor]],
-    loss_config: DictConfig,
     train=True
 ) -> Tuple[torch.FloatTensor, Dict[str, List]]:
     """Compute the SFT loss and other metrics for the given batch of inputs.
@@ -59,10 +59,6 @@ def get_batch_metrics(
     metrics = {}
     train_test = 'train' if train else 'eval'
 
-    if loss_config.name != 'sft':
-        raise NotImplementedError(
-            f'loss {loss_config.name} not implemented'
-        )
 
     policy_chosen_logits = model(
         input_ids=batch['chosen_input_ids'],

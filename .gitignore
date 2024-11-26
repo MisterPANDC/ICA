@@ -1,2 +1,3 @@
 *.zip
 SFT_function_learning-main
+__pycache__
