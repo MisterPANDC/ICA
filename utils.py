@@ -31,18 +31,30 @@ def _get_batch_logps(
         probabilities of the given labels under the given logits.
     """
     assert logits.shape[:-1] == labels.shape
+    logits = logits.cpu()
+    labels = labels.cpu()
 
-    labels = labels[:, 1:].clone()
+    # labels = labels[:, 1:].clone()
+    labels = labels[:, 1:]
     logits = logits[:, :-1, :]
     loss_mask = (labels != -100)
 
     # dummy token; we'll ignore the losses on these tokens later
     labels[labels == -100] = 0
+    print(labels.shape)
 
     per_token_logps = torch.gather(
         logits.log_softmax(-1), dim=2, index=labels.unsqueeze(2)
     ).squeeze(2)
 
+    print(per_token_logps.shape)
+    print(loss_mask.shape)
+
+    print(per_token_logps.dtype)
+    print(loss_mask.dtype)
+
+    per_token_logps = per_token_logps.cpu()
+    loss_mask = loss_mask.cpu()
     if average_log_prob:
         return (per_token_logps * loss_mask).sum(-1) / loss_mask.sum(-1)
     else:
